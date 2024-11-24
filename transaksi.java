@@ -40,3 +40,15 @@ public class transaksi {
         this.isApproved = true;
     }
 }
+
+
+@Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Customer Id: ").append(customer.getId()).append("\n");
+        sb.append("List barang yang dibeli:\n");
+        for (Barang b : barang) {
+            sb.append("- ").append(b.getNama()).append(": Rp ").append(b.getHarga()).append("\n");
+        }
+        return sb.toString();
+    }
