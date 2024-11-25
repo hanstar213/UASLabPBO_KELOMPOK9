@@ -1,0 +1,10 @@
+B001, Laptop ASUS VivoBook, 5000000, 15
+B002, Smartphone Samsung Galaxy A54, 4500000, 30
+B003, Headphone Sony WH-1000XM4, 3500000, 20
+B004, Smartwatch Apple Watch Series 9, 7000000, 25
+B005, Keyboard Mechanical Logitech, 1200000, 50
+B006, Mouse Gaming Razer DeathAdder, 800000, 40
+B007, Powerbank Anker 20000mAh, 350000, 60
+B008, Kamera Canon EOS 1500D, 6000000, 12
+B009, TV Samsung 4K UHD, 7500000, 10
+B010, Sepatu Nike Air Max 270, 2500000, 35
