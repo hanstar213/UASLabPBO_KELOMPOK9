@@ -8,7 +8,7 @@ public class Customer extends Account {
 
     @Override
     public void login() {
-        System.out.println("Customer " + userName + " berhasil login.");
+        System.out.println("<Customer " + userName + " berhasil login>");
     }
 
     public Keranjang getKeranjang() {

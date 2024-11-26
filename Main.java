@@ -14,6 +14,7 @@ public class Main {
         System.out.println("Selamat datang di Sistem Perbelanjaan Online!");
 
         while (true) {
+            ClearScreen();
             System.out.println("\nMenu Utama:");
             System.out.println("1. Login");
             System.out.println("2. Register");
@@ -28,22 +29,24 @@ public class Main {
                     Driver driver = createDriver(user); // Membuat objek driver dari kelas Driver
                     driver.menu(); // Jalankan menu driver (Admin atau Customer)
                 } else {
-                    System.out.println("Username atau password salah!");
+                    System.out.println("<Username atau password salah>");
                 }
             } else if (pilihan == 2) {
                 register(input); // Memanggil metode register
             } else if (pilihan == 3) {
-                System.out.println("Terima kasih telah menggunakan sistem ini!");
+                System.out.println("END OF PROGRAM");
                 break;
             } else {
-                System.out.println("Pilihan tidak valid.");
+                System.out.println("<Pilihan tidak valid>");
             }
+            input.nextLine();
         }
 
         input.close();
+        ClearScreen();
     }
 
-    // Pindahkan metode login ke sini, di luar dari main()
+    // Method untuk login
     public static Account login(Scanner input) {
         System.out.print("Masukkan Username : ");
         String userName = input.nextLine();
@@ -54,11 +57,12 @@ public class Main {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 3 && parts[0].equals(userName) && parts[1].equals(password)) {
-                    String role = parts[2];
+                if (parts.length == 4 && parts[1].equals(userName) && parts[2].equals(password)) {
+                    String role = parts[3];
+                    String customerId =  parts[0];
 
                     if (role.equals("customer")) {
-                        return new Customer("000", userName, password);
+                        return new Customer(customerId, userName, password);
                     }
                 }
             }
@@ -68,25 +72,56 @@ public class Main {
         return null;
     }
 
-    // Pindahkan metode register ke sini, di luar dari main()
     public static void register(Scanner input) {
         System.out.print("Masukkan Username : ");
         String userName = input.nextLine();
         System.out.print("Masukkan Password : ");
         String password = input.nextLine();
-        System.out.print("Pilih role (admin/customer): ");
-        String role = input.nextLine().toLowerCase();
-
-        if (!role.equals("admin") && !role.equals("customer")) {
-            System.out.println("Role tidak valid. Silakan masukkan admin atau customer.");
-            return;
+       
+        // Cek apakah username sudah ada
+        try (BufferedReader br = new BufferedReader(new FileReader(AKUN_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4 && parts[1].equals(userName)) {
+                    System.out.println("<Username sudah terdaftar, silakan pilih username lain>");
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error membaca file akun: " + e.getMessage());
         }
-
-        if (addAccountToFile(userName, password, role)) {
-            System.out.println("Registrasi berhasil! Silakan login.");
+    
+        // Buat ID baru
+        String newId = generateNewId();
+    
+        // Tambahkan akun baru
+        if (addAccountToFile(newId, userName, password, "customer")) {
+            System.out.println("<Registrasi berhasil>");
         } else {
-            System.out.println("Gagal melakukan registrasi. Username mungkin sudah terdaftar.");
+            System.out.println("<Gagal melakukan registrasi>");
         }
+    }
+
+    public static String generateNewId() {
+        int maxId = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(AKUN_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4 && parts[0].startsWith("C")) {
+                    try {
+                        int currentId = Integer.parseInt(parts[0].substring(1));
+                        maxId = Math.max(maxId, currentId);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error readind ID from file..");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("File not found or error reading file..");
+        }
+        return String.format("C%03d", maxId + 1);
     }
 
     // Metode lainnya tetap sama
@@ -101,27 +136,20 @@ public class Main {
     }
 
     // Tambahkan akun baru ke file
-    public static boolean addAccountToFile(String username, String password, String role) {
-        try (BufferedReader br = new BufferedReader(new FileReader(AKUN_FILE))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 3 && parts[0].equals(username)) {
-                    return false; // Username sudah ada
-                }
-            }
-        } catch (IOException e) {
-            // Jika file tidak ada, lanjutkan untuk membuat file baru
-        }
-
-        // Tambahkan akun baru
+    public static boolean addAccountToFile(String id, String username, String password, String role) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(AKUN_FILE, true))) {
-            bw.write(username + "," + password + "," + role);
+            bw.write(id + "," + username + "," + password + "," + role);
             bw.newLine();
             return true;
         } catch (IOException e) {
-            System.out.println("Error menyimpan file akun: " + e.getMessage());
+            System.out.println("Error saving Account.txt " + e.getMessage());
         }
         return false;
+    }
+
+    public static void ClearScreen(){
+            // Escape code ANSI untuk membersihkan layar
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
     }
 }

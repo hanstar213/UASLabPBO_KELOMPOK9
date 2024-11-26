@@ -1,0 +1,2 @@
+C000,B001,Laptop ASUS VivoBook,5000000.0,6
+C000,B002,Smartphone Samsung Galaxy A54,4500000.0,1

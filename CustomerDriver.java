@@ -3,23 +3,18 @@ import java.util.Scanner;
 
 public class CustomerDriver extends Driver {
     private Customer customer;
+    private ListBarang daftarBarang;
 
     public CustomerDriver(Customer customer){
         super(customer);
         this.customer = customer;
+        this.daftarBarang = new ListBarang();
+        this.daftarBarang.loadFromFile("Barang.txt");
     }
 
     @Override
     public void menu(){
         Scanner input = new Scanner(System.in);
-        ListBarang daftarBarang = new ListBarang();
-        daftarBarang.loadFromFile("Barang.txt");
-
-        if (daftarBarang.getDaftarBarang().isEmpty()) {
-            System.out.println("Daftar barang kosong!");
-        } else {
-            System.out.println("Daftar barang berhasil dimuat.");
-        }
 
         while(true){
             System.out.println("\nMenu Pelanggan:");
@@ -34,7 +29,33 @@ public class CustomerDriver extends Driver {
             int is_continue=0;
             switch(pilihan){
                 case 1 :
-                    System.out.println("+------------+------------------------------------------+-----------------+------------+");
+                    showItems();
+                    break;
+                case 2 :
+                    // keranjang
+                    cart(input);
+                    break;
+
+                case 3 :
+                    // Checkout
+                    customer.getKeranjang().showCart(customer);
+                    break;
+                case 4 :
+                    System.out.println("<Terima kasih telah berbelanja>");
+                    is_continue = 1;
+                    break;
+                default:
+                    System.out.println("<Pilihan tidak valid>.");
+                    break;
+            }
+            if (is_continue == 1){
+                break;
+            }
+        }
+    }
+
+    public void showItems(){
+        System.out.println("+------------+------------------------------------------+-----------------+------------+");
                     System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Stok");
                     System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
                     for (Barang barang : daftarBarang.getDaftarBarang()) {
@@ -46,26 +67,35 @@ public class CustomerDriver extends Driver {
                                 barang.getStok());
                             System.out.println("+------------+------------------------------------------+-----------------+------------+");
                     }
-                    break;
-                case 2 :
-                    // keranjang
-                    break;
-
-                case 3 :
-                    // Checkout
-                    
-                    break;
-                case 4 :
-                    System.out.println("Terima kasih telah berbelanja.");
-                    is_continue = 1;
-                    break;
-                default:
-                    System.out.println("Pilihan tidak valid.");
-                    break;
-            }
-            if (is_continue == 1){
-                break;
-            }
-        }
     }
+
+    public void cart(Scanner input){
+        System.out.println("Keranjang");
+                    System.out.println("=====================");
+                    System.out.print("Masukkan id barang atau nama barang yang ingin dicari : ");
+                    String cartInput = input.nextLine();
+                    System.out.print("Masukkan Jumlah : ");
+                    int jumlah  = input.nextInt();
+                    input.nextLine();
+                    Barang barangDipilih = null;
+
+                    for (Barang barang : daftarBarang.getDaftarBarang()) {
+                        if (barang.getIdBarang().equals(cartInput) || barang.getNamaBarang().equals(cartInput)) {
+                            barangDipilih = barang;
+                            break;
+                        }
+                    }
+
+                    if (barangDipilih != null && jumlah <= barangDipilih.getStok()) {
+                        // Tambahkan ke keranjang
+                        customer.getKeranjang().addToCart(customer, barangDipilih, jumlah);
+
+                        // Kurangi stok barang
+                        barangDipilih.setStok(barangDipilih.getStok() - jumlah);
+                        System.out.println("Barang berhasil ditambahkan ke keranjang.");
+                    } else {
+                        System.out.println("Barang tidak ditemukan atau stok tidak mencukupi.");
+                    }
+    }
+
 }
