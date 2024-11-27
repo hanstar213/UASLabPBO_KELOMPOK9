@@ -21,6 +21,4 @@ public abstract class Account{
         return password;
     }
 
-    public abstract void login();
-
 }

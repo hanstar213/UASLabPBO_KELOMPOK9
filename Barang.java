@@ -83,10 +83,6 @@ public class Barang {
 
     @Override
     public String toString() {
-        return idBarang + "," + namaBarang + "," + hargaBarang + "," + stok;
-    }
-
-    public String toString(String customerId) {
         return customerId + "," + idBarang + "," + namaBarang + "," + hargaBarang + "," + stok;
     }
 }

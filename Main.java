@@ -8,13 +8,28 @@ import java.util.Scanner;
 public class Main {
     private static final String AKUN_FILE = "Account.txt";
 
+    public static void clearScreen() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                // Perintah untuk Windows
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                // Perintah untuk Linux/MacOS
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (IOException | InterruptedException e) {
+                System.out.println("Gagal menghapus layar: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
         System.out.println("Selamat datang di Sistem Perbelanjaan Online!");
 
         while (true) {
-            ClearScreen();
+            clearScreen();
             System.out.println("\nMenu Utama:");
             System.out.println("1. Login");
             System.out.println("2. Register");
@@ -43,7 +58,7 @@ public class Main {
         }
 
         input.close();
-        ClearScreen();
+        clearScreen();
     }
 
     // Method untuk login
@@ -59,10 +74,12 @@ public class Main {
                 String[] parts = line.split(",");
                 if (parts.length == 4 && parts[1].equals(userName) && parts[2].equals(password)) {
                     String role = parts[3];
-                    String customerId =  parts[0];
-
+                    String accountId =  parts[0];
+                    // if (role.equals("admin")) {
+                        // return new Admin(accountId, userName, password);
+                    // } else 
                     if (role.equals("customer")) {
-                        return new Customer(customerId, userName, password);
+                        return new Customer(accountId, userName, password);
                     }
                 }
             }
@@ -129,6 +146,7 @@ public class Main {
         // if (user instanceof Admin) {
         //     return new AdminDriver((Admin) user);
         // } 
+        // else 
         if (user instanceof Customer) {
             return new CustomerDriver((Customer) user);
         }
@@ -145,11 +163,5 @@ public class Main {
             System.out.println("Error saving Account.txt " + e.getMessage());
         }
         return false;
-    }
-
-    public static void ClearScreen(){
-            // Escape code ANSI untuk membersihkan layar
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
     }
 }

@@ -6,11 +6,6 @@ public class Customer extends Account {
         this.keranjang = new Keranjang();
     }
 
-    @Override
-    public void login() {
-        System.out.println("<Customer " + userName + " berhasil login>");
-    }
-
     public Keranjang getKeranjang() {
         return keranjang;
     }

@@ -1,4 +1,2 @@
 C001,c123,123,customer
-C002,c234,opw,customer
-C003,atha,123,customer
-C004,ikram,123,customer
+C002,a111,111,customer

@@ -1,9 +1,8 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListBarang {
-    private List<Barang> daftarBarang;
+    private ArrayList<Barang> daftarBarang;
 
     public ListBarang(){
         this.daftarBarang = new ArrayList<>();
@@ -62,8 +61,63 @@ public class ListBarang {
         }
     }
 
+    // Method untuk memperbarui stok barang dengan mengurangi jumlah yang diberikan
+    public void updateStok(String idBarang, int jumlah) {
+        for (Barang barang : daftarBarang) {
+            if (barang.getIdBarang().equals(idBarang)) {
+                int stokBaru = barang.getStok() - jumlah;
+                if (stokBaru >= 0) {
+                    barang.setStok(stokBaru); // Update stok jika jumlah cukup
+                    saveToFile("Barang.txt"); // Simpan perubahan ke file setelah stok diperbarui
+                } else {
+                    System.out.println("<Stok tidak mencukupi untuk pengurangan>");
+                }
+            }
+        }
+    }
+
+    public void updateStokAfterCancel(String idBarang, int jumlahBatal) {
+        String fileBarang = "Barang.txt";
+        StringBuilder updatedContent = new StringBuilder();
+        boolean found = false;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileBarang))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4 && parts[0].equals(idBarang)) {
+                    // Update stok barang jika ID sesuai
+                    int stokLama = Integer.parseInt(parts[3]);
+                    int stokBaru = stokLama + jumlahBatal; // Tambahkan stok dengan jumlah yang dibatalkan
+    
+                    // Tambahkan data barang yang sudah di-update ke StringBuilder
+                    updatedContent.append(parts[0]).append(",")
+                                   .append(parts[1]).append(",")
+                                   .append(parts[2]).append(",")
+                                   .append(stokBaru).append("\n");
+                    found = true;
+                } else {
+                    // Jika barang tidak ditemukan, tambahkan data lama tanpa perubahan
+                    updatedContent.append(line).append("\n");
+                }
+            }
+    
+            // Jika barang ditemukan dan stok sudah diperbarui, tuliskan ulang ke file
+            if (found) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBarang))) {
+                    writer.write(updatedContent.toString());
+                }
+            } else {
+                System.out.println("<Barang tidak ditemukan>");
+            }
+    
+        } catch (IOException e) {
+            System.out.println("Gagal memperbarui stok barang: " + e.getMessage());
+        }
+    }
+    
     // method untuk menampilkan daftar barang
-    public List<Barang> getDaftarBarang(){
+    public ArrayList<Barang> getDaftarBarang(){
         return daftarBarang;
     }
 

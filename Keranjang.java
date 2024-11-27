@@ -1,10 +1,9 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Keranjang {
-    private List<Barang> daftarKeranjang;
-    private String fileName = "Cart.txt";
+    private ArrayList<Barang> daftarKeranjang;
+    public String fileName = "Cart.txt";
 
     public Keranjang() {
         this.daftarKeranjang = new ArrayList<>();
@@ -12,23 +11,35 @@ public class Keranjang {
 
     // Menambahkan item ke dalam keranjang
     public void addToCart(Customer customer, Barang barang, int jumlah) {
-        int is_found_primary_id = 0;
-        is_found_primary_id = loadFromFile(fileName, barang, jumlah);
-        if (is_found_primary_id == 0) {
-            Barang item = new Barang(customer.getId(), barang.getIdBarang(), barang.getNamaBarang(), barang.getHargaBarang(), jumlah);
-            daftarKeranjang.add(item);
-            saveToFile(customer, fileName);
-        } else if(is_found_primary_id == 1){
-            saveToFile(customer, fileName);
+        // Muat data dari file Cart.txt ke daftarKeranjang
+        loadFromFile(fileName);
+
+        boolean foundPrimaryKey = false;
+
+        // Perbarui data barang jika ditemukan
+        for (Barang item : daftarKeranjang) {
+            if (item.getIdBarang().equals(barang.getIdBarang()) && item.getCustomerId().equals(customer.getId())) {
+                item.setStok(item.getStok() + jumlah); // Update jumlah
+                foundPrimaryKey = true;
+                break;
+            }
         }
-        daftarKeranjang.clear();
+
+        // Jika primary key tidak ditemukan, tambahkan sebagai barang baru
+        if (!foundPrimaryKey) {
+            Barang itemBaru = new Barang(customer.getId(), barang.getIdBarang(), barang.getNamaBarang(), barang.getHargaBarang(), jumlah);
+            daftarKeranjang.add(itemBaru);
+        }
+
+        // Simpan ulang semua data ke file
+        saveToFile(customer, fileName);
     }
 
-    // Menyimpan keranjang ke dalam file Cart.txt
+    // Menyimpan data daftar keranjang ke file Cart.txt
     public void saveToFile(Customer customer, String fileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Barang item : daftarKeranjang) {
-                writer.write(item.toString(customer.getId()));
+                writer.write(item.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -36,36 +47,10 @@ public class Keranjang {
         }
     }
 
-    // Memuat keranjang dari file Cart.txt
-    public int loadFromFile(String fileName, Barang barang, int jumlah) {
-        int primaryCustomerId = 0;
-        
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 5) {
-                    String customerId = parts[0];
-                    String idBarang = parts[1];
-                    String namaBarang = parts[2];
-                    double hargaBarang = Double.parseDouble(parts[3]);
-                    int jumlahBarangKeranjang = Integer.parseInt(parts[4]);
-                    if (barang.getIdBarang().equals(idBarang)) {
-                        jumlahBarangKeranjang += jumlah; 
-                        primaryCustomerId = 1;
-                    } else {
-                    daftarKeranjang.add(new Barang(customerId, idBarang, namaBarang, hargaBarang, jumlahBarangKeranjang));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error loading from Cart.txt.. " + e.getMessage());
-        }
-
-        return primaryCustomerId;
-    }
-
+    // Memuat data dari file Cart.txt
     public void loadFromFile(String fileName) {
+        daftarKeranjang.clear(); // Hapus daftar keranjang sebelum memuat ulang data
+
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -76,14 +61,16 @@ public class Keranjang {
                     String namaBarang = parts[2];
                     double hargaBarang = Double.parseDouble(parts[3]);
                     int jumlahBarangKeranjang = Integer.parseInt(parts[4]);
-                    daftarKeranjang.add(new Barang(customerId, idBarang, namaBarang, hargaBarang, jumlahBarangKeranjang));  
+
+                    // Tambahkan data ke daftarKeranjang
+                    daftarKeranjang.add(new Barang(customerId, idBarang, namaBarang, hargaBarang, jumlahBarangKeranjang));
                 }
             }
         } catch (IOException e) {
             System.out.println("Error loading from Cart.txt.. " + e.getMessage());
         }
     }
-    
+
     // Menampilkan daftar keranjang
     public void showCart(Customer customer){
         loadFromFile(fileName);
@@ -102,5 +89,24 @@ public class Keranjang {
                         }
                     }
         daftarKeranjang.clear();
+    }
+
+    public void removeFromCart(String customerId, String idBarang) {
+        loadFromFile(fileName); // Memuat data dari file Cart.txt
+    
+        // Menemukan dan menghapus barang berdasarkan customerId dan idBarang
+        for (int i = 0; i < daftarKeranjang.size(); i++) {
+            Barang item = daftarKeranjang.get(i);
+            if (item.getCustomerId().equals(customerId) && item.getIdBarang().equals(idBarang)) {
+                daftarKeranjang.remove(i);  // Hapus barang dari daftar
+                saveToFile(null, fileName); // Simpan perubahan ke file Cart.txt
+                return;
+            }
+        }
+        System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan di keranjang.");
+    }
+
+    public ArrayList<Barang> getDaftarKeranjang() {
+        return daftarKeranjang;
     }
 }
