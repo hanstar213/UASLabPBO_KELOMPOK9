@@ -1,5 +1,7 @@
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Keranjang {
     private ArrayList<Barang> daftarKeranjang;
@@ -74,20 +76,22 @@ public class Keranjang {
     // Menampilkan daftar keranjang
     public void showCart(Customer customer){
         loadFromFile(fileName);
+        DecimalFormat df = new DecimalFormat("#,###", new java.text.DecimalFormatSymbols(Locale.GERMANY));
         System.out.println("+------------+------------------------------------------+-----------------+------------+");
-                    System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Jumlah");
-                    System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
-                    for (Barang barang : daftarKeranjang) {
-                        // Menampilkan data barang dalam format tabel
-                        if (barang.getCustomerId().equals(customer.getId())) {                        
-                            System.out.printf("| %-10s | %-40s | %-15.2f | %-10d |\n",
-                                barang.getIdBarang(),
-                                barang.getNamaBarang(),
-                                barang.getHargaBarang(),
-                                barang.getStok());
-                            System.out.println("+------------+------------------------------------------+-----------------+------------+");
-                        }
-                    }
+        System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Jumlah");
+        System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
+            for (Barang barang : daftarKeranjang) {
+                // Menampilkan data barang dalam format tabel
+                if (barang.getCustomerId().equals(customer.getId())) {           
+                    String hargaBarang = df.format(barang.getHargaBarang()); // Format harga dengan pemisah ribuan             
+                    System.out.printf("| %-10s | %-40s | Rp%-13s | %-10d |\n",
+                    barang.getIdBarang(),
+                    barang.getNamaBarang(),
+                    hargaBarang,
+                    barang.getStok());
+                    System.out.println("+------------+------------------------------------------+-----------------+------------+");
+                }
+            }
         daftarKeranjang.clear();
     }
 

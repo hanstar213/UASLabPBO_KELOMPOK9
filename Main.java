@@ -3,6 +3,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -23,6 +24,17 @@ public class Main {
         }
     }
 
+    public static int getSafeIntInput(Scanner scanner) {
+        int value = 0;
+            try {
+                value = scanner.nextInt(); // Membaca input angka
+            } catch (InputMismatchException e) {
+                scanner.nextLine(); // Membersihkan input buffer
+            }
+        return value;
+    }
+    
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
@@ -30,12 +42,12 @@ public class Main {
 
         while (true) {
             clearScreen();
-            System.out.println("\nMenu Utama:");
+            System.out.println("=======================\n       Menu Login\n=======================");
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.println("3. Keluar");
             System.out.print("Pilihan: ");
-            int pilihan = input.nextInt();
+            int pilihan = getSafeIntInput(input);
             input.nextLine(); // Membersihkan newline
 
             if (pilihan == 1) {
@@ -75,10 +87,9 @@ public class Main {
                 if (parts.length == 4 && parts[1].equals(userName) && parts[2].equals(password)) {
                     String role = parts[3];
                     String accountId =  parts[0];
-                    // if (role.equals("admin")) {
-                        // return new Admin(accountId, userName, password);
-                    // } else 
-                    if (role.equals("customer")) {
+                    if (role.equals("admin")) {
+                        return new Admin(accountId, userName, password);
+                    } else if (role.equals("customer")) {
                         return new Customer(accountId, userName, password);
                     }
                 }
@@ -143,11 +154,10 @@ public class Main {
 
     // Metode lainnya tetap sama
     public static Driver createDriver(Account user) {
-        // if (user instanceof Admin) {
-        //     return new AdminDriver((Admin) user);
-        // } 
-        // else 
-        if (user instanceof Customer) {
+        if (user instanceof Admin) {
+            return new AdminDriver((Admin) user);
+        } 
+        else if (user instanceof Customer) {
             return new CustomerDriver((Customer) user);
         }
         return null;

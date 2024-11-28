@@ -2,6 +2,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.InputMismatchException;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class CustomerDriver extends Driver {
@@ -25,7 +28,8 @@ public class CustomerDriver extends Driver {
         }
         Scanner input = new Scanner(System.in);
 
-        while(true){
+        int is_continue=1;
+        while(is_continue==1){
             Main.clearScreen();
             System.out.println("\nMenu Pelanggan:");
             System.out.println("1) Lihat Barang");
@@ -34,10 +38,9 @@ public class CustomerDriver extends Driver {
             System.out.println("4) Riwayat Transaksi");
             System.out.println("5) Keluar");
             System.out.print("Pilihan: ");
-            int pilihan = input.nextInt();
+            int pilihan = Main.getSafeIntInput(input);
             input.nextLine();
             
-            int is_continue=0;
             switch(pilihan){
                 case 1 :
                     // Menu Menampilkan seluruh barang
@@ -59,14 +62,11 @@ public class CustomerDriver extends Driver {
                     break;
                 case 5 :
                     System.out.println("<Terima kasih telah berbelanja>");  // keluar dari program
-                    is_continue = 1;
+                    is_continue = 0;
                     break;
                 default:
                     System.out.println("<Pilihan tidak valid>.");
                     break;
-            }
-            if (is_continue == 1){
-                break;
             }
             input.nextLine(); // input enter
         }
@@ -75,22 +75,25 @@ public class CustomerDriver extends Driver {
     // method untuk menampilkan barang
     public void showItems(){
         Main.clearScreen();
+        DecimalFormat df = new DecimalFormat("#,###", new java.text.DecimalFormatSymbols(Locale.GERMANY));
+
+        // Menampilkan data barang dalam format tabel
         System.out.println("+------------+------------------------------------------+-----------------+------------+");
                     System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Stok");
                     System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
                     for (Barang barang : daftarBarang.getDaftarBarang()) {
-                        // Menampilkan data barang dalam format tabel
-                        System.out.printf("| %-10s | %-40s | %-15.2f | %-10d |\n",
+                        String hargaBarang = df.format((barang.getHargaBarang())); // Format harga dengan pemisah ribuan
+                        System.out.printf("| %-10s | %-40s | Rp%-13s | %-10d |\n",
                                 barang.getIdBarang(),
                                 barang.getNamaBarang(),
-                                barang.getHargaBarang(),
+                                hargaBarang,
                                 barang.getStok());
                             System.out.println("+------------+------------------------------------------+-----------------+------------+");
                     }
         System.out.println("\n<Tekan enter untuk berhenti menampilkan daftar>");
     }
 
-    // method untuk menambahkan barang ke dalam keranjang
+    // method menu menambahkan barang ke dalam keranjang
     public int addToCartMenu(Scanner input){
         while (true) { 
             Main.clearScreen();
@@ -99,7 +102,7 @@ public class CustomerDriver extends Driver {
             System.out.println("2) Tambah barang ke keranjang");
             System.out.println("3) Kembali");
             System.out.print("Masukkan pilihan : ");
-            int option = input.nextInt();
+            int option = Main.getSafeIntInput(input);
             input.nextLine();
             if(option == 1){
                 showItems();
@@ -115,11 +118,27 @@ public class CustomerDriver extends Driver {
         }
     }
 
+    // Method menambah barang ke keranjang
     public void doAddToCart(Scanner input){
+        Main.clearScreen();
         System.out.print("Masukkan id barang atau nama barang yang ingin dicari : ");
         String cartInput = input.nextLine();
-        System.out.print("Masukkan Jumlah : ");
-        int jumlah  = input.nextInt();
+
+        boolean isValid = false;
+        int jumlah = 0;
+        while (!isValid) {
+            try {
+                System.out.print("Masukkan jumlah : ");
+                jumlah = input.nextInt(); // Membaca input angka
+                isValid = true; // Jika berhasil membaca angka, keluar dari loop
+            } catch (InputMismatchException e) {
+                System.out.println("Input tidak valid! Harap masukkan angka");
+                input.nextLine(); // Membersihkan input yang salah
+                input.nextLine();
+                Main.clearScreen();
+            }
+        }
+
         input.nextLine();
         Barang barangDipilih = null;
         for (Barang barang : daftarBarang.getDaftarBarang()) {
@@ -129,15 +148,17 @@ public class CustomerDriver extends Driver {
                 }
             }
             
+            DecimalFormat df = new DecimalFormat("#,###", new java.text.DecimalFormatSymbols(Locale.GERMANY));
+            String hargaBarang = df.format(barangDipilih.getHargaBarang()); // Format harga dengan pemisah ribuan
+            String totalHarga = df.format((jumlah*barangDipilih.getHargaBarang())); // Format harga dengan pemisah ribuan
             if (barangDipilih != null && jumlah <= barangDipilih.getStok()) {
-                // Tambahkan ke keranjang
                 // Tampilkan detail barang yang dipilih sebelum menambahkannya ke keranjang
                 System.out.println("\nBarang yang Anda pilih :");
                 System.out.println("ID Barang\t\t : " + barangDipilih.getIdBarang());
                 System.out.println("Nama Barang\t\t : " + barangDipilih.getNamaBarang());
-                System.out.println("Harga Barang\t\t : " + barangDipilih.getHargaBarang());
-                System.out.println("Stok Barang\t\t : " + barangDipilih.getStok());
-                System.out.println("Jumlah yang ingin dibeli : " + jumlah);
+                System.out.println("Harga Barang\t\t : Rp" + hargaBarang);
+                System.out.println("Jumlah Barang\t\t : " + jumlah);
+                System.out.println("Total Harga\t\t : Rp" + totalHarga);
                 
                 System.out.print("\nApakah Anda yakin ingin menambahkan barang ini ke keranjang? (y/n): ");
                 String konfirmasi = input.nextLine();
@@ -146,8 +167,6 @@ public class CustomerDriver extends Driver {
                     // Tambahkan ke keranjang
                     customer.getKeranjang().addToCart(customer, barangDipilih, jumlah);
 
-                    // Kurangi stok barang
-                    barangDipilih.setStok(barangDipilih.getStok() - jumlah);
                     System.out.println("\n<Barang berhasil ditambahkan ke keranjang>");
                     } else if(konfirmasi.equalsIgnoreCase("n")) {
                         System.out.println("\n<Penambahan barang ke keranjang dibatalkan>");
@@ -168,7 +187,7 @@ public class CustomerDriver extends Driver {
             System.out.println("2) Batalkan Checkout");
             System.out.println("3) Kembali");
             System.out.print("Masukkan Pilihan : ");
-            int option = input.nextInt();
+            int option = Main.getSafeIntInput(input);
             input.nextLine();
             if (option == 1) {
                 doCheckout(input);
@@ -196,83 +215,88 @@ public class CustomerDriver extends Driver {
         System.out.print("Masukkan ID barang yang ingin di checkout: ");
         String idBarang = input.nextLine();
         
-        // Konfirmasi sebelum transaksi
-        System.out.print("\nApakah Anda yakin ingin melakukan checkout barang ini? (y/n): ");
-        String konfirmasiCheckout = input.nextLine();
-        if (!konfirmasiCheckout.equalsIgnoreCase("y")) {
-            System.out.println("\n<Checkout dibatalkan>");
-            return 0;
-        }
-    
-        System.out.println("\nMetode pembayaran:");
-        System.out.println("1) QRIS");
-        System.out.println("2) Bank");
-        System.out.println("3) COD");
-        System.out.print("Masukkan pilihan: ");
-        int option = input.nextInt();
-        input.nextLine();
-    
-        Pembayaran metodePembayaran = null;
-        String metodePembayaranStr = "";
-        switch (option) {
-            case 1:
-                metodePembayaran = new QRIS("Q000"); // Membuat objek QRIS
-                metodePembayaranStr = "QRIS";
-                break;
-            case 2:
-                metodePembayaran = new Bank("M000"); // Membuat objek Bank
-                metodePembayaranStr = "Bank";
-                break;
-            case 3:
-                metodePembayaran = new COD("D000"); // Membuat objek COD
-                metodePembayaranStr = "COD";
-                break;
-            default:
-                System.out.println("<Pilihan tidak valid>");
-                return 0;
-        }
-    
-        // Tampilkan konfirmasi setelah memilih metode pembayaran
-        System.out.println("\nMetode pembayaran yang Anda pilih: " + metodePembayaranStr);
-        System.out.print("Apakah Anda yakin ingin melanjutkan dengan metode pembayaran ini? (y/n): ");
-        String konfirmasiMetodePembayaran = input.nextLine();
-        if (!konfirmasiMetodePembayaran.equalsIgnoreCase("y")) {
-            System.out.println("<Pembayaran dibatalkan>");
-            return 0;
-        }
-    
         synchronizeKeranjang();
+        boolean found = false;
         Barang barangDipilih = null;
         for (Barang barang : customer.getKeranjang().getDaftarKeranjang()) {
             if (barang.getIdBarang().equals(idBarang)) {
                 barangDipilih = barang;
+                found = true;
                 break;
             }
         }
-    
-        if (barangDipilih != null) {
-            // Konfirmasi untuk transaksi
-            System.out.print("\nApakah Anda yakin ingin melakukan transaksi untuk barang ini? (y/n): ");
-            String konfirmasiTransaksi = input.nextLine();
-            if (!konfirmasiTransaksi.equalsIgnoreCase("y")) {
-                System.out.println("<Transaksi dibatalkan>");
-                return 0;
-            }
+
+        if(found){
+            // Konfirmasi sebelum transaksi
+            System.out.print("\nApakah Anda yakin ingin melakukan checkout barang ini? (y/n): ");
+            String konfirmasi = input.nextLine();
+            if (konfirmasi.equalsIgnoreCase("y")) {
+                System.out.println("\nMetode pembayaran:");
+                System.out.println("1) QRIS");
+                System.out.println("2) Bank");
+                System.out.println("3) COD");
+                System.out.print("Masukkan pilihan: ");
+                int option = Main.getSafeIntInput(input);
+                input.nextLine();
             
-            Main.clearScreen();
-            Transaksi transaksi = new Transaksi(null, null, null, null, null, null); // Dummy untuk method statis
-            transaksi.doTransaksi(customer, barangDipilih, metodePembayaran);
-            System.out.println("\n<Transaksi Berhasil>");
-    
-            // Hapus barang dari keranjang
-            customer.getKeranjang().removeFromCart(customer.getId(), idBarang);
-            daftarBarang.updateStok(idBarang, barangDipilih.getStok());
-        } else {
-            System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan di keranjang.");
+                Pembayaran metodePembayaran = null;
+                String metodePembayaranStr = "";
+                switch (option) {
+                    case 1:
+                        metodePembayaran = new QRIS("Q000"); // Membuat objek QRIS
+                        metodePembayaranStr = "QRIS";
+                        break;
+                    case 2:
+                        metodePembayaran = new Bank("M000"); // Membuat objek Bank
+                        metodePembayaranStr = "Bank";
+                        break;
+                    case 3:
+                        metodePembayaran = new COD("D000"); // Membuat objek COD
+                        metodePembayaranStr = "COD";
+                        break;
+                    default:
+                        System.out.println("<Pilihan tidak valid>");
+                        return 0;
+                }
+            
+                // Tampilkan konfirmasi setelah memilih metode pembayaran
+                System.out.println("\nMetode pembayaran yang Anda pilih: " + metodePembayaranStr);
+                System.out.print("Apakah Anda yakin ingin melanjutkan dengan metode pembayaran ini? (y/n): ");
+                String konfirmasiMetodePembayaran = input.nextLine();
+                if (!konfirmasiMetodePembayaran.equalsIgnoreCase("y")) {
+                    System.out.println("<Pembayaran dibatalkan>");
+                    return 0;
+                }
+                    
+                // Konfirmasi untuk transaksi
+                System.out.print("\nApakah Anda yakin ingin melakukan transaksi untuk barang ini? (y/n): ");
+                String konfirmasiTransaksi = input.nextLine();
+                if (!konfirmasiTransaksi.equalsIgnoreCase("y")) {
+                    System.out.println("<Transaksi dibatalkan>");
+                    return 0;
+                }
+                    
+                Main.clearScreen();
+                Transaksi transaksi = new Transaksi(null, null, null, null, null, null); // Dummy untuk method statis
+                transaksi.doTransaksi(customer, barangDipilih, metodePembayaran);
+                System.out.println("\n<Transaksi Berhasil>");
+            
+                // Hapus barang dari keranjang
+                customer.getKeranjang().removeFromCart(customer.getId(), idBarang);
+                // Kurangi stok barang
+                daftarBarang.updateStok(idBarang, barangDipilih.getStok());   
+                } else if (konfirmasi.equalsIgnoreCase("n")) {
+                    System.out.println("\n<Chehkout dibatalkan>");
+                } else{
+                    System.out.println("\n<Pilihan tidak valid>");
+                }
+
+        } else if(!found){
+            System.out.println("\n<Barang dengan id " + idBarang + " tidak ditemukan>");
         }
+
         return 0;
     }
-    
     
     public void synchronizeKeranjang() {
         String fileCart = "Cart.txt";
@@ -327,34 +351,38 @@ public class CustomerDriver extends Driver {
     
         System.out.print("Masukkan ID barang yang ingin dibatalkan checkout : ");
         String idBarang = input.nextLine();
-        
-        // Konfirmasi sebelum membatalkan checkout
-        System.out.print("\nApakah Anda yakin ingin membatalkan checkout untuk barang ini? (y/n): ");
-        String konfirmasiBatal = input.nextLine();
-        if (!konfirmasiBatal.equalsIgnoreCase("y")) {
-            System.out.println("\n<Pembatalan checkout dibatalkan>");
-            return 0;
-        }
-    
+
         synchronizeKeranjang();
-        // Mencari barang di keranjang
+        boolean found = false;
         Barang barangDipilih = null;
         for (Barang barang : customer.getKeranjang().getDaftarKeranjang()) {
             if (barang.getIdBarang().equals(idBarang)) {
                 barangDipilih = barang;
+                found = true;
                 break;
             }
         }
-    
-        if (barangDipilih != null) {
-            // Jika barang ditemukan, hapus barang dari keranjang
-            customer.getKeranjang().removeFromCart(customer.getId(), idBarang);
-            daftarBarang.updateStokAfterCancel(idBarang, barangDipilih.getStok());
-            System.out.println("<Barang dengan ID " + idBarang + " berhasil dibatalkan dari keranjang>");
-        } else {
-            // Jika barang tidak ditemukan
-            System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan di keranjang.");
+
+        if(found){
+             // Konfirmasi sebelum membatalkan checkout
+            System.out.print("\nApakah Anda yakin ingin membatalkan checkout untuk barang ini? (y/n): ");
+            String konfirmasi = input.nextLine();
+            if (konfirmasi.equalsIgnoreCase("y")) {
+                // Jika barang ditemukan, hapus barang dari keranjang
+                customer.getKeranjang().removeFromCart(customer.getId(), idBarang);
+                daftarBarang.updateStokAfterCancel(idBarang, barangDipilih.getStok());
+                System.out.println("<Barang dengan ID " + idBarang + " berhasil dibatalkan dari keranjang>");
+                return 0;
+            } else if (konfirmasi.equalsIgnoreCase("n")){
+                System.out.println("\n<Pembatalan checkout dibatalkan>");
+            } else{
+                System.out.println("\n<Pilihan tidak valid>");
+            }
+
+        } else if (!found) {
+            System.out.println("\n<Barang dengan id "+ idBarang + " tidak ditemukan>");
         }
+        
         return 0;
     }
     

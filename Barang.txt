@@ -1,6 +1,6 @@
-B001,Laptop ASUS VivoBook,5000000.0,46
+B001,Laptop ASUS VivoBook,5000000.0,45
 B002,Smartphone Samsung Galaxy A54,4500000.0,32
-B003,Headphone Sony WH-1000XM4,3500000.0,22
+B003,Headphone Sony WH-1000XM4,3500000.0,29
 B004,Smartwatch Apple Watch Series 9,7000000.0,46
 B005,Keyboard Mechanical Logitech,1200000.0,50
 B006,Mouse Gaming Razer DeathAdder,800000.0,38
@@ -16,7 +16,7 @@ B015,Keyboard Corsair K95 RGB,1800000.0,36
 B016,Mouse Logitech G Pro X,1200000.0,29
 B017,Powerbank Xiaomi 20000mAh,450000.0,43
 B018,Kamera Nikon D3500,6500000.0,39
-B019,TV LG OLED 55G,1.2E7,25
+B019,TV LG OLED 55G,1200000.0,25
 B020,Sepatu Adidas Ultraboost,3000000.0,50
 B021,Laptop HP Pavilion,4800000.0,41
 B022,Smartphone Oppo Reno 8,4300000.0,33

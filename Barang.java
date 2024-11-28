@@ -4,7 +4,9 @@ public class Barang {
     private String namaBarang;
     private double hargaBarang;
     private int stok;
-   
+    
+    public Barang(){
+    }
 
     public Barang(String idBarang, String namaBarang, double hargaBarang, int stok){
         this.idBarang = idBarang;
