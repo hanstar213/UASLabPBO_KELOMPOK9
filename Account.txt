@@ -1,2 +1,0 @@
-C001,c123,123,customer
-A001,admin123,123,admin
