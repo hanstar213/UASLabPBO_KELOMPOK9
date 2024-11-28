@@ -1,4 +1,6 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class AdminDriver extends Driver {
@@ -31,7 +33,7 @@ public class AdminDriver extends Driver {
             System.out.println("6) Keluar");
             System.out.print("Pilihan: ");
 
-            int pilihan = scanner.nextInt();
+            int pilihan = Main.getSafeIntInput(scanner);
             scanner.nextLine(); // Clear newline
 
             Main.clearScreen();
@@ -70,18 +72,21 @@ public class AdminDriver extends Driver {
     public void showItems(){
         Main.clearScreen();
         listBarang.loadFromFile("Barang.txt");
+        DecimalFormat df = new DecimalFormat("#,###", new java.text.DecimalFormatSymbols(Locale.GERMANY));
+        
+        // Menampilkan data barang dalam format tabel
         System.out.println("+------------+------------------------------------------+-----------------+------------+");
-                    System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Stok");
-                    System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
-                    for (Barang barang : listBarang.getDaftarBarang()) {
-                        // Menampilkan data barang dalam format tabel
-                        System.out.printf("| %-10s | %-40s | %-15.2f | %-10d |\n",
-                                barang.getIdBarang(),
-                                barang.getNamaBarang(),
-                                barang.getHargaBarang(),
-                                barang.getStok());
-                            System.out.println("+------------+------------------------------------------+-----------------+------------+");
-                    }
+        System.out.printf("| %-10s | %-40s | %-15s | %-10s |\n", "ID Barang", "Nama Barang", "Harga", "Stok");
+        System.out.println("+------------+------------------------------------------+-----------------+------------+");                    
+            for (Barang barang : listBarang.getDaftarBarang()) {
+                String hargaBarang = df.format((barang.getHargaBarang())); // Format harga dengan pemisah ribuan
+                System.out.printf("| %-10s | %-40s | Rp%-13s | %-10d |\n",
+                    barang.getIdBarang(),
+                    barang.getNamaBarang(),
+                    hargaBarang,
+                    barang.getStok());
+                    System.out.println("+------------+------------------------------------------+-----------------+------------+");
+                }
         listBarang.getDaftarBarang().clear();
         System.out.println("\n<Tekan enter untuk berhenti menampilkan daftar>");
     }

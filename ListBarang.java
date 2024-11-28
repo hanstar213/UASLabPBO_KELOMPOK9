@@ -43,6 +43,7 @@ public class ListBarang {
 
     // Method untuk menambahkan barang
     public void tambahBarang(Scanner scanner) {
+        daftarBarang.clear();
         System.out.print("Masukkan ID Barang: ");
         String idBarang = scanner.nextLine();
         System.out.print("Masukkan Nama Barang: ");
@@ -53,7 +54,7 @@ public class ListBarang {
         int stok = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
 
-        System.out.print("Apakah anda yakin ingin menambahkan barang tersebut? (y/n) :");
+        System.out.print("\nApakah anda yakin ingin menambahkan barang tersebut? (y/n) :");
         String konfirmasi = scanner.nextLine();
             if (konfirmasi.equalsIgnoreCase("y")) {     
                 Barang barang = new Barang(idBarang, namaBarang, hargaBarang, stok);
@@ -77,46 +78,53 @@ public class ListBarang {
         loadFromFile(fileName);
         boolean found = false;
         Barang removeBarang = new Barang();
-        for (Barang barang : daftarBarang) {
-            if (barang.getIdBarang().equals(idBarang)) {
-                removeBarang = barang; 
-                found = true;
-                break;
+            for (Barang barang : daftarBarang) {
+                if (barang.getIdBarang().equals(idBarang)) {
+                    removeBarang = barang; 
+                    found = true;
+                    break;
+                    }
                 }
-            }
-        
-        Main.clearScreen();
-        System.out.println("Barang yang ingin dihapus : ");
-        System.out.println("ID Barang\t\t : " + removeBarang.getIdBarang());
-        System.out.println("Nama Barang\t\t : " + removeBarang.getNamaBarang());
-        System.out.println("Harga Barang\t\t : " + removeBarang.getHargaBarang());
-        System.out.println("Stok Barang\t\t : " + removeBarang.getStok());
 
-        System.out.print("Apakah anda yakin ingin menghapus barang tersebut? (y/n) :");
-        String konfirmasi = scanner.nextLine();
-            if (konfirmasi.equalsIgnoreCase("y")) {     
-                daftarBarang.remove(removeBarang);
-                saveToFile(fileName); // Simpan perubahan ke file
-                System.out.println("\n<Barang dengan ID " + idBarang + " berhasil dihapus>");
-                daftarBarang.clear();
-                scanner.nextLine();
-                if (!found) {
-                    System.out.println("<Barang dengan ID " + idBarang + " tidak ditemukan>");
+        if (found) {
+            
+            Main.clearScreen();
+            System.out.println("Barang yang ingin dihapus : ");
+            System.out.println("ID Barang\t\t : " + removeBarang.getIdBarang());
+            System.out.println("Nama Barang\t\t : " + removeBarang.getNamaBarang());
+            System.out.println("Harga Barang\t\t : " + removeBarang.getHargaBarang());
+            System.out.println("Stok Barang\t\t : " + removeBarang.getStok());
+
+            System.out.print("\nApakah anda yakin ingin menghapus barang tersebut? (y/n) :");
+            String konfirmasi = scanner.nextLine();
+                if (konfirmasi.equalsIgnoreCase("y")) {     
+                    daftarBarang.remove(removeBarang);
+                    saveToFile(fileName); // Simpan perubahan ke file
+                    System.out.println("\n<Barang dengan ID " + idBarang + " berhasil dihapus>");
+                    daftarBarang.clear();
+                    scanner.nextLine();
+                    if (!found) {
+                        System.out.println("<Barang dengan ID " + idBarang + " tidak ditemukan>");
+                    }
+                } else if(konfirmasi.equalsIgnoreCase("n")) {
+                    System.out.println("\n<Penghapusan barang ke dibatalkan>");
+                    scanner.nextLine();
+                } else {
+                    System.out.println("\n<Pilihan tidak valid>");
+                    scanner.nextLine();
                 }
-            } else if(konfirmasi.equalsIgnoreCase("n")) {
-                System.out.println("\n<Penghapusan barang ke dibatalkan>");
-                scanner.nextLine();
-            } else {
-                System.out.println("\n<Pilihan tidak valid>");
-                scanner.nextLine();
-            }
-        daftarBarang.clear();
+            daftarBarang.clear();
+        }
+        else if (!found) {
+                System.out.println("\n<Barang dengan ID " + idBarang + " tidak ditemukan>");
+        }    
     }
 
     // Method untuk mengedit barang berdasarkan ID
     public void editBarang(Scanner scanner) {
         System.out.print("Masukkan ID Barang yang akan diedit: ");
         String idBarang = scanner.nextLine();
+        daftarBarang.clear();
         loadFromFile(fileName);
         boolean found = false;
         Barang editBarang = new Barang();
@@ -127,44 +135,45 @@ public class ListBarang {
                 break;
                 }
             }
-            
-        if (!found) {
-                System.out.println("Barang dengan ID " + idBarang + " tidak ditemukan.");
+
+        if (found) {
+            Main.clearScreen();
+            System.out.println("Barang yang ingin diedit : ");
+            System.out.println("ID Barang\t\t : " + editBarang.getIdBarang());
+            System.out.println("Nama Barang\t\t : " + editBarang.getNamaBarang());
+            System.out.println("Harga Barang\t\t : " + editBarang.getHargaBarang());
+            System.out.println("Stok Barang\t\t : " + editBarang.getStok());
+
+            System.out.print("\nMasukkan Nama Barang baru: ");
+            String namaBarang = scanner.nextLine();
+            System.out.print("Masukkan Harga Barang baru: ");
+            double hargaBarang = scanner.nextDouble();
+            System.out.print("Masukkan Stok Barang baru: ");
+            int stok = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            System.out.print("\nApakah anda yakin ingin menghapus barang tersebut? (y/n) :");
+            String konfirmasi = scanner.nextLine();
+                if (konfirmasi.equalsIgnoreCase("y")) {     
+                        editBarang.setNamaBarang(namaBarang);
+                        editBarang.setHargaBarang(hargaBarang);
+                        editBarang.setStok(stok);
+                        saveToFile(fileName); // Simpan perubahan ke file
+                        
+                        System.out.println("\n<Barang dengan ID " + idBarang + " berhasil diedit>");
+
+                } else if(konfirmasi.equalsIgnoreCase("n") || found) {
+                    System.out.println("\n<Pengeditan barang ke dibatalkan>");
+                    scanner.nextLine();
+                } else {
+                    System.out.println("\n<Pilihan tidak valid>");
+                    scanner.nextLine();
+                }
+            daftarBarang.clear();
+        }
+        else if (!found) {
+                System.out.println("\n<Barang dengan ID " + idBarang + " tidak ditemukan>");
         }    
-        
-        Main.clearScreen();
-        System.out.println("Barang yang ingin diedit : ");
-        System.out.println("ID Barang\t\t : " + editBarang.getIdBarang());
-        System.out.println("Nama Barang\t\t : " + editBarang.getNamaBarang());
-        System.out.println("Harga Barang\t\t : " + editBarang.getHargaBarang());
-        System.out.println("Stok Barang\t\t : " + editBarang.getStok());
-
-        System.out.print("\nMasukkan Nama Barang baru: ");
-        String namaBarang = scanner.nextLine();
-        System.out.print("Masukkan Harga Barang baru: ");
-        double hargaBarang = scanner.nextDouble();
-        System.out.print("Masukkan Stok Barang baru: ");
-        int stok = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
-
-        System.out.print("\nApakah anda yakin ingin menghapus barang tersebut? (y/n) :");
-        String konfirmasi = scanner.nextLine();
-            if (konfirmasi.equalsIgnoreCase("y")) {     
-                    editBarang.setNamaBarang(namaBarang);
-                    editBarang.setHargaBarang(hargaBarang);
-                    editBarang.setStok(stok);
-                    saveToFile(fileName); // Simpan perubahan ke file
-                     
-                    System.out.println("\n<Barang dengan ID " + idBarang + " berhasil diedit>");
-
-            } else if(konfirmasi.equalsIgnoreCase("n") || found) {
-                System.out.println("\n<Pengeditan barang ke dibatalkan>");
-                scanner.nextLine();
-            } else {
-                System.out.println("\n<Pilihan tidak valid>");
-                scanner.nextLine();
-            }
-        daftarBarang.clear();
     }
 
     // Method untuk memperbarui stok barang dengan mengurangi jumlah yang diberikan
@@ -204,7 +213,47 @@ public class ListBarang {
         return false; // Barang tidak ditemukan
     }
     
-    // Method untuk menampilkan daftar barang
+    public void updateStokAfterCancel(String idBarang, int jumlahBatal) {
+        String fileBarang = "Barang.txt";
+        StringBuilder updatedContent = new StringBuilder();
+        boolean found = false;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileBarang))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4 && parts[0].equals(idBarang)) {
+                    // Update stok barang jika ID sesuai
+                    int stokLama = Integer.parseInt(parts[3]);
+                    int stokBaru = stokLama + jumlahBatal; // Tambahkan stok dengan jumlah yang dibatalkan
+    
+                    // Tambahkan data barang yang sudah di-update ke StringBuilder
+                    updatedContent.append(parts[0]).append(",")
+                                   .append(parts[1]).append(",")
+                                   .append(parts[2]).append(",")
+                                   .append(stokBaru).append("\n");
+                    found = true;
+                } else {
+                    // Jika barang tidak ditemukan, tambahkan data lama tanpa perubahan
+                    updatedContent.append(line).append("\n");
+                }
+            }
+    
+            // Jika barang ditemukan dan stok sudah diperbarui, tuliskan ulang ke file
+            if (found) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBarang))) {
+                    writer.write(updatedContent.toString());
+                }
+            } else {
+                System.out.println("<Barang tidak ditemukan>");
+            }
+    
+        } catch (IOException e) {
+            System.out.println("Gagal memperbarui stok barang: " + e.getMessage());
+        }
+    }
+    
+    // Method untuk menampilkan d   aftar barang
     public ArrayList<Barang> getDaftarBarang() {
         return daftarBarang;
     }
