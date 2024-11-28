@@ -1,0 +1,30 @@
+B001,Laptop ASUS VivoBook,5000000.0,45
+B002,Smartphone Samsung Galaxy A54,4500000.0,32
+B003,Headphone Sony WH-1000XM4,3500000.0,29
+B004,Smartwatch Apple Watch Series 9,7000000.0,46
+B005,Keyboard Mechanical Logitech,1200000.0,50
+B006,Mouse Gaming Razer DeathAdder,800000.0,38
+B007,Powerbank Anker 20000mAh,350000.0,42
+B008,Kamera Canon EOS 1500D,6000000.0,31
+B009,TV Samsung 4K UHD,7500000.0,29
+B010,Sepatu Nike Air Max 270,2500000.0,44
+B011,Laptop Dell Inspiron,5500000.0,34
+B012,Smartphone Xiaomi Redmi Note 12,4000000.0,48
+B013,Headphone Bose QuietComfort 45,5000000.0,27
+B014,Smartwatch Fitbit Versa 4,3500000.0,50
+B015,Keyboard Corsair K95 RGB,1800000.0,36
+B016,Mouse Logitech G Pro X,1200000.0,29
+B017,Powerbank Xiaomi 20000mAh,450000.0,43
+B018,Kamera Nikon D3500,6500000.0,39
+B019,TV LG OLED 55G,1200000.0,25
+B020,Sepatu Adidas Ultraboost,3000000.0,50
+B021,Laptop HP Pavilion,4800000.0,41
+B022,Smartphone Oppo Reno 8,4300000.0,33
+B023,Headphone Sennheiser Momentum 3,4500000.0,48
+B024,Smartwatch Garmin Forerunner 945,8000000.0,29
+B025,Keyboard Razer BlackWidow V3,1500000.0,40
+B026,Mouse SteelSeries Rival 600,1100000.0,30
+B027,Powerbank Aukey 20000mAh,400000.0,50
+B028,Kamera Sony Alpha A6400,8000000.0,30
+B029,TV Panasonic 4K,6700000.0,43
+B030,Sepatu Puma Ignite,2200000.0,37
